@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 DIR="example_model"
-cd ..
+cd $(dirname $0)/..
 if test -d $DIR; then
 	rm -rf $DIR
 fi
-oarepo-compile-model ./tests/model/model_app.yaml --output-directory ./$DIR
+oarepo-compile-model ./tests/model/model_app.yaml --output-directory ./$DIR -vvv
 
 echo "checking existence of test files"
 
