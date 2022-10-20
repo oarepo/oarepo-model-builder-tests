@@ -1,0 +1,10 @@
+model:
+  properties:
+    metadata:
+      properties:  # to add yout own properties, remove this line and uncomment the next one
+        title:
+          type: fulltext
+
+oarepo:use:
+  - invenio
+

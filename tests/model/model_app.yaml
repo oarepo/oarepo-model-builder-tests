@@ -1,0 +1,9 @@
+oarepo:use:
+  - ./model_metadata.yaml
+
+
+
+# normally there is no need to modify the settings bellow, but feel free
+settings:
+  package: ron_model
+  schema-server: 'local://'
