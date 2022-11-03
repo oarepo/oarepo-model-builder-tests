@@ -86,3 +86,4 @@ tests/test-sample-site
 
 example_model/
 dist/
+.vscode/
