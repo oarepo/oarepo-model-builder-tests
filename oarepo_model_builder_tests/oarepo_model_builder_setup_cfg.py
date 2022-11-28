@@ -11,7 +11,9 @@ class OarepoModelBuilderSetupCfgBuilder(OutputBuilder):
                          ("invenio_search[elasticsearch7]",">=2.0.0"),
                          ("Werkzeug","<2.2.0"),
                          ("Flask-Login",">=0.6.1"),
-                         ("pyyaml",">=6.0")]
+                         ("pyyaml",">=6.0"),
+                         ("requests",">=2.28.1"),
+                        ]
 
 
     def finish(self):
