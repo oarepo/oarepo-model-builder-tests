@@ -117,9 +117,23 @@ def test_delete(client_with_credentials, sample_record, app, search_clear):
     assert deleted_get_response.status_code == 410
 
 
-def test_search(client_with_credentials, sample_records, search_clear):
-    sample_record = sample_records[0]
-    res_one = client_with_credentials.get(f"{BASE_URL}?q=fish attack painting")
+def test_search(client_with_credentials, sample_records, sample_record, search_clear):
+    #sample record creates the first record in sample records, therefore the first record is created and saved twice
+    def num_actual_search_results(queried_title, records_list):
+        def get_words(title):
+            if title[-1] == ".": #the ending dot can invalidate the result
+                title = title[:-1]
+            return set(map(str.lower, title.split()))
+        num_records_with_shared_words = 0
+        queried_words = get_words(queried_title)
+        for record in records_list:
+            if queried_words & get_words(record.metadata["title"]):
+                num_records_with_shared_words += 1
+        return num_records_with_shared_words
+    single_record_metadata = sample_records[1].metadata["title"]
+    duplicated_record_metadata = sample_record.metadata["title"]
+    res_single_record = client_with_credentials.get(f"{BASE_URL}?q={single_record_metadata}")
+    res_duplicated_record = client_with_credentials.get(f"{BASE_URL}?q={duplicated_record_metadata}")
     res_fail = client_with_credentials.get(f"{BASE_URL}?q=wefrtghthy")
     res_created = client_with_credentials.get(
         f"{BASE_URL}?q={str(datetime.datetime.now().date())}"
@@ -130,8 +144,8 @@ def test_search(client_with_credentials, sample_records, search_clear):
     )
 
     assert len(res_fail.json["hits"]["hits"]) == 0
-
-    assert len(res_one.json["hits"]["hits"]) == 1
+    assert len(res_single_record.json["hits"]["hits"]) == num_actual_search_results(single_record_metadata, sample_records)
+    assert len(res_duplicated_record.json["hits"]["hits"]) == num_actual_search_results(duplicated_record_metadata, sample_records) + 1
     assert len(res_created.json["hits"]["hits"]) == 25
     assert len(res_created_fail.json["hits"]["hits"]) == 0
     assert len(res_facets.json["hits"]["hits"]) == 1
