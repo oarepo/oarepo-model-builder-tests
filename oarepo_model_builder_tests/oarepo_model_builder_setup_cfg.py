@@ -8,7 +8,7 @@ class OarepoModelBuilderSetupCfgBuilder(OutputBuilder):
     TEST_DEPENDENCIES = [("invenio-app",">=1.3.3"),
                          ("invenio-db[postgresql,mysql,versioning]",">=1.0.14,<2.0.0"),
                          ("pytest-invenio",">=1.4.11"),
-                         ("invenio_search[elasticsearch7]",">=2.0.0"),
+                         ("invenio_search[opensearch2]",">=2.0.0"),
                          ("Werkzeug","<2.2.0"),
                          ("Flask-Login",">=0.6.1"),
                          ("pyyaml",">=6.0"),
