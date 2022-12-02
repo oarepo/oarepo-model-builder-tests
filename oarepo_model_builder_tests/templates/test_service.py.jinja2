@@ -1,5 +1,6 @@
 import pytest
 import pytz
+from invenio_records.dictutils import dict_lookup
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDDoesNotExistError, PIDDeletedError
 import datetime
@@ -67,27 +68,26 @@ def test_delete(app, db, sample_record, search_clear):
         current_service.read(system_identity, sample_record["id"])
 
 
-def test_search(app, db, sample_records, sample_record, sample_metadata_list, search_clear):
-    #sample record creates the first record in sample records, therefore the first record is created and saved twice
-    def num_actual_search_results(queried_title, records_list):
-        def get_words(title):
-            if title[-1] == ".": #the ending dot can invalidate the result
-                title = title[:-1]
-            return set(map(str.lower, title.split()))
-        num_records_with_shared_words = 0
-        queried_words = get_words(queried_title)
-        for record in records_list:
-            if queried_words & get_words(record.metadata["title"]):
-                num_records_with_shared_words += 1
-        return num_records_with_shared_words
-    single_record_metadata = sample_records[1].metadata["title"]
-    duplicated_record_metadata = sample_record.metadata["title"]
-    res_single_record = list(
-        current_service.search(system_identity, params={"q": single_record_metadata})
-    )
-    res_duplicated_record = list(
-        current_service.search(system_identity, params={"q": duplicated_record_metadata})
-    )
+def test_search(
+    app, db, sample_records, sample_metadata_list, search_clear
+):
+    def get_paths(cur_path, cur_dict):
+        ret_paths = []
+        for k, v in cur_dict.items():
+            if not isinstance(v, dict):
+                ret_paths.append(f"{cur_path}.{k}")
+            else:
+                ret_paths += get_paths(f"{cur_path}.{k}", v)
+        return ret_paths
+    paths = get_paths("metadata", sample_metadata_list[0]["metadata"])
+
+    for record in sample_records:
+        for path in paths:
+            field_value = dict_lookup(record, path)
+            path_search_results = current_service.search(system_identity, params={"q": f"{path}:\"{field_value}\""})
+            assert len(path_search_results) > 0
+
+
     res_fail = list(current_service.search(system_identity, params={"q": "wefrtghthy"}))
     res_created = list(
         current_service.search(
@@ -103,7 +103,7 @@ def test_search(app, db, sample_records, sample_record, sample_metadata_list, se
             system_identity,
             params={
                 "facets": {
-                    "created": [pytz.utc.localize(sample_record.created).isoformat()]
+                    "created": [pytz.utc.localize(sample_records[0].created).isoformat()]
                 }
             },
         ).hits
@@ -113,8 +113,6 @@ def test_search(app, db, sample_records, sample_record, sample_metadata_list, se
 
     assert len(res_fail) == 0
     assert len(res_listing) == 25
-    assert len(res_single_record) == num_actual_search_results(single_record_metadata, sample_records)
-    assert len(res_duplicated_record) == num_actual_search_results(duplicated_record_metadata, sample_records) + 1
     assert len(res_created) == 25
     assert len(res_created_fail) == 0
     assert len(res_facets) == 1
