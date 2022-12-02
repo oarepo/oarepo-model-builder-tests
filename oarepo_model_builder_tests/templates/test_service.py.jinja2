@@ -86,6 +86,11 @@ def test_search(
             field_value = dict_lookup(record, path)
             path_search_results = current_service.search(system_identity, params={"q": f"{path}:\"{field_value}\""})
             assert len(path_search_results) > 0
+            for field_result in [dict_lookup(res, path) for res in list(path_search_results)]:
+                if field_result == field_value:
+                    break
+            else:
+                assert False
 
 
     res_fail = list(current_service.search(system_identity, params={"q": "wefrtghthy"}))

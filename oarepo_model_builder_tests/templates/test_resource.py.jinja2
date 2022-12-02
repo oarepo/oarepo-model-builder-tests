@@ -133,6 +133,11 @@ def test_search(client_with_credentials, sample_records, sample_metadata_list, s
             field_value = dict_lookup(record, path)
             path_search_results = client_with_credentials.get(f"{BASE_URL}?q={path}:\"{field_value}\"").json["hits"]["hits"]
             assert len(path_search_results) > 0
+            for field_result in [dict_lookup(res, path) for res in path_search_results]:
+                if field_result == field_value:
+                    break
+            else:
+                assert False
 
     res_fail = client_with_credentials.get(f"{BASE_URL}?q=wefrtghthy")
     res_created = client_with_credentials.get(
