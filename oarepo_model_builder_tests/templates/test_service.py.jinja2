@@ -90,7 +90,7 @@ def test_search(
                 if field_result == field_value:
                     break
             else:
-                assert False
+                raise AssertionError("Queried field value not found in search results.")
 
 
     res_fail = list(current_service.search(system_identity, params={"q": "wefrtghthy"}))

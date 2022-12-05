@@ -137,7 +137,7 @@ def test_search(client_with_credentials, sample_records, sample_metadata_list, s
                 if field_result == field_value:
                     break
             else:
-                assert False
+                raise AssertionError("Queried field value not found in search results.")
 
     res_fail = client_with_credentials.get(f"{BASE_URL}?q=wefrtghthy")
     res_created = client_with_credentials.get(
