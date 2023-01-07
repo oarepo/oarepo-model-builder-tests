@@ -39,8 +39,8 @@ def app_config(app_config):
     app_config["RATELIMIT_AUTHENTICATED_USER"] = "200 per second"
     app_config["SEARCH_HOSTS"] = [
         {
-            'host': os.environ.get('SEARCH_HOSTS_HOST', 'localhost'),
-            'port': os.environ.get('SEARCH_HOSTS_PORT', '9200'),
+            'host': os.environ.get('OPENSEARCH_HOST', 'localhost'),
+            'port': os.environ.get('OPENSEARCH_PORT', '9200'),
         }
     ]
     return app_config
