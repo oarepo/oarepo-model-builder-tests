@@ -1,8 +1,8 @@
 import datetime
 from invenio_records.dictutils import dict_lookup
-from {{ model.record_resource_config_class|package_name }} import {{ model.record_resource_config_class|base_name }}
+from {{ schema.model.record_resource_config_class|package_name }} import {{ schema.model.record_resource_config_class|base_name }}
 
-BASE_URL = f"http://localhost{{ "{" }} {{ model.record_resource_config_class|base_name }}.url_prefix{{ "}" }}"
+BASE_URL = f"http://localhost{{ "{" }} {{ schema.model.record_resource_config_class|base_name }}.url_prefix{{ "}" }}"
 
 
 def test_get_item(client_with_credentials, sample_record, search_clear):

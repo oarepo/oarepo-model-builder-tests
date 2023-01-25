@@ -11,5 +11,6 @@ class ConftestBuilder(InvenioBaseClassPythonBuilder):
         self.process_template(
             python_path,
             self.template,
+            schema=self.schema,
             **extra_kwargs,
         )

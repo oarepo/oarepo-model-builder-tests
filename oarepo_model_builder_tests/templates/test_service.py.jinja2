@@ -5,7 +5,7 @@ from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDDoesNotExistError, PIDDeletedError
 import datetime
 
-from {{ model.proxies_current_service|package_name }} import {{ model.proxies_current_service|base_name }}
+from {{ schema.model.proxies_current_service|package_name }} import {{ schema.model.proxies_current_service|base_name }}
 
 
 def test_read(app, db, sample_record, sample_metadata_list, search_clear):
