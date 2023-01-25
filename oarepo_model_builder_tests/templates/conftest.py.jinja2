@@ -10,8 +10,8 @@ from invenio_app.factory import create_api
 from invenio_records_resources.services.uow import UnitOfWork, RecordCommitOp
 import os
 
-from {{ python.proxies_current_service|package_name }} import {{ python.proxies_current_service|base_name }}
-from {{ python.record_class|package_name }} import {{ python.record_class|base_name }}
+from {{ model.proxies_current_service|package_name }} import {{ model.proxies_current_service|base_name }}
+from {{ model.record_class|package_name }} import {{ model.record_class|base_name }}
 
 
 @pytest.fixture(scope="function")
@@ -52,7 +52,7 @@ def sample_record(app, db, sample_metadata_list):
     # record = current_service.create(system_identity, sample_data[0])
     # return record
     with UnitOfWork(db.session) as uow:
-        record = {{ python.record_class|base_name }}.create(sample_metadata_list[0])
+        record = {{ model.record_class|base_name }}.create(sample_metadata_list[0])
         uow.register(RecordCommitOp(record, current_service.indexer, True))
         uow.commit()
         return record
@@ -65,7 +65,7 @@ def sample_records(app, db, sample_metadata_list):
     with UnitOfWork(db.session) as uow:
         records = []
         for sample_metadata in sample_metadata_list:
-            record = {{ python.record_class|base_name }}.create(sample_metadata)
+            record = {{ model.record_class|base_name }}.create(sample_metadata)
             uow.register(RecordCommitOp(record, current_service.indexer, True))
             records.append(record)
         uow.commit()
