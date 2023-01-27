@@ -1,9 +1,14 @@
-oarepo:use:
-  - ./model_metadata.yaml
-
-
-
-# normally there is no need to modify the settings bellow, but feel free
-settings:
+model:
+  properties:
+    metadata:
+      properties:
+        whateverfulltext:
+          type: fulltext
+        whateverkeyword:
+          type: keyword
+        whateverboth:
+          type: fulltext+keyword
+  use:
+    - invenio
   package: ron_model
   schema-server: 'local://'

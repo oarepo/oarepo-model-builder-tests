@@ -5,7 +5,7 @@ from {{ schema.model.record_resource_config_class|package_name }} import {{ sche
 BASE_URL = f"http://localhost{{ "{" }} {{ schema.model.record_resource_config_class|base_name }}.url_prefix{{ "}" }}"
 
 
-def test_get_item(client_with_credentials, sample_record, search_clear):
+def test_get_item({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_record, search_clear):
     non_existing = client_with_credentials.get(f"{BASE_URL}yjuykyukyuk")
     assert non_existing.status_code == 404
 
@@ -15,7 +15,7 @@ def test_get_item(client_with_credentials, sample_record, search_clear):
 
 
 def test_create(
-    client_with_credentials, client, sample_metadata_list, app, search_clear
+    {% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, client, sample_metadata_list, app, search_clear
 ):
     created_responses = []
     for sample_metadata_point in sample_metadata_list:
@@ -42,14 +42,14 @@ def test_create(
         )
 
 
-def test_listing(client_with_credentials, sample_records, search_clear):
+def test_listing({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_records, search_clear):
     listing_response = client_with_credentials.get(BASE_URL)
     hits = listing_response.json["hits"]["hits"]
     assert len(hits) == 25
 
 
 def test_update(
-    client_with_credentials, sample_record, sample_metadata_list, search_clear
+    {% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_record, sample_metadata_list, search_clear
 ):
     non_existing = client_with_credentials.put(
         f"{BASE_URL}yjuykyukyuk", json=sample_metadata_list[15]
@@ -95,7 +95,7 @@ def test_update(
     #                                                              "value": "UPDATED!"})
 
 
-def test_delete(client_with_credentials, sample_record, app, search_clear):
+def test_delete({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_record, app, search_clear):
     non_existing = client_with_credentials.delete(f"{BASE_URL}yjuykyukyuk")
     assert non_existing.status_code == 404
 
@@ -117,7 +117,7 @@ def test_delete(client_with_credentials, sample_record, app, search_clear):
     assert deleted_get_response.status_code == 410
 
 
-def test_search(client_with_credentials, sample_records, sample_metadata_list, search_clear):
+def test_search({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_records, sample_metadata_list, search_clear):
     def get_paths(cur_path, cur_dict):
         ret_paths = []
         for k, v in cur_dict.items():
