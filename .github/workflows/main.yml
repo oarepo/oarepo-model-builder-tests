@@ -34,7 +34,7 @@ jobs:
 
       - name: Test with pytest
         run: |
-          sh tests/test.sh
+          sh run_tests.sh
       #    pytest tests
       #
       #    - name: Coveralls
