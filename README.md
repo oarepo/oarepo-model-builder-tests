@@ -2,7 +2,7 @@
 Plugin for oarepo-model-builder to generate 
 test files and add test dependencies. <br>
 The record service and its rest api are covered for now. Tests read, write,
-update, delete and search operations.<br> The tests use automatically generated metadata in {model_name}/data/sample_data.yaml file to create records and upload them as fixtures.
+update, delete and search operations.<br> The tests use automatically generated metadata in {model_name}/data/sample_data.yaml file to create records and upload them as fixtures. If you modify sample_data.yaml, make sure it contains at least two records with different metadata.
 <br>
 <br> 
 Resource test:
