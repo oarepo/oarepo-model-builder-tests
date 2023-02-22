@@ -12,4 +12,20 @@ Resource test:
 * `test_delete`: Tries to delete non-existing record. Then tries to delete an existing one and checks whether the get call return 410 error http code. Also checks that unauthorized client can't delete.
 * `test_search`: Finds all metadata fields generated in the test data. Then tries search based on values in the fields and checks whether at least one record with the same field value is returned. Tries search based on created time, with correct time, wrong time and as a facet.
 
-The service tests are analogous, they only bypass the api and use the expected service methods directly. 
+The service tests are analogous, they only bypass the api and use the expected service methods directly.
+
+## Installation
+
+### model.yaml
+
+```yaml
+model:
+ plugins:
+  packages:
+   - oarepo-model-builder-tests
+```
+### command line
+```bash
+pip install oarepo-model-builder
+pip install oarepo-model-builder-tests
+```
