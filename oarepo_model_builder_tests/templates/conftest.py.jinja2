@@ -20,6 +20,10 @@ def sample_metadata_list():
     docs = list(yaml.load_all(open(data_path), Loader=yaml.SafeLoader))
     return docs
 
+@pytest.fixture()
+def input_data(sample_metadata_list):
+    return sample_metadata_list[0]
+
 
 @pytest.fixture(scope="module")
 def create_app(instance_path, entry_points):
@@ -48,11 +52,11 @@ def app_config(app_config):
 
 
 @pytest.fixture(scope="function")
-def sample_record(app, db, sample_metadata_list):
+def sample_record(app, db, input_data):
     # record = current_service.create(system_identity, sample_data[0])
     # return record
     with UnitOfWork(db.session) as uow:
-        record = {{ schema.model.record_class|base_name }}.create(sample_metadata_list[0])
+        record = {{ schema.model.record_class|base_name }}.create(input_data)
         uow.register(RecordCommitOp(record, current_service.indexer, True))
         uow.commit()
         return record
