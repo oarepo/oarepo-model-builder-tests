@@ -2,7 +2,7 @@ from oarepo_model_builder.invenio.invenio_base import InvenioBaseClassPythonBuil
 
 
 class TestResourceBuilder(InvenioBaseClassPythonBuilder):
-    TYPE = "test_resource"
+    TYPE = "invenio_tests_resource"
     template = "test_resource"
     MODULE = "tests.test_resource"
 

@@ -1,10 +1,10 @@
 from oarepo_model_builder.invenio.invenio_base import InvenioBaseClassPythonBuilder
 
 
-class ConftestBuilder(InvenioBaseClassPythonBuilder):
-    TYPE = "invenio_tests_conftest"
-    template = "conftest"
-    MODULE = "tests.conftest"
+class TestUtilsBuilder(InvenioBaseClassPythonBuilder):
+    TYPE = "test_utils"
+    template = "test_utils"
+    MODULE = "tests.utils"
 
     def finish(self, **extra_kwargs):
         python_path = self.module_to_path(self.MODULE)

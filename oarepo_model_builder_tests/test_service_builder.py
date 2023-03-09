@@ -2,7 +2,7 @@ from oarepo_model_builder.invenio.invenio_base import InvenioBaseClassPythonBuil
 
 
 class TestServiceBuilder(InvenioBaseClassPythonBuilder):
-    TYPE = "test_service"
+    TYPE = "invenio_tests_service"
     template = "test_service"
     MODULE = "tests.test_service"
 
