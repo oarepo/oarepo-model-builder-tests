@@ -29,7 +29,11 @@ echo "checking the test files are runnable"
 cd $DIR
 python3 -m venv venv
 . venv/bin/activate
+pip install -U setuptools pip wheel
 pip install -e ".[tests]"
+echo "installing flask fix"
+pip install flask==2.2.3
+echo "testing"
 python tests/conftest.py
 python tests/test_resource.py
 python tests/test_service.py

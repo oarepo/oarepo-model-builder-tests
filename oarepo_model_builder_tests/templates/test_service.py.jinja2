@@ -4,7 +4,23 @@ from invenio_records.dictutils import dict_lookup
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDDoesNotExistError, PIDDeletedError
 import datetime
-from .utils import get_paths
+
+def _get_paths(cur_path, cur_val):
+    ret_paths = []
+    if isinstance(cur_val, list):
+        return ret_paths
+    elif isinstance(cur_val, dict):
+        for k, v in cur_val.items():
+            ret_paths += get_paths(f"{cur_path}.{k}", v)
+    else:
+        if cur_path.startswith("."):
+            cur_path = cur_path[1:]
+        ret_paths.append(f"{cur_path}")
+    return ret_paths
+
+
+def get_paths(prefix, data):
+    return _get_paths(prefix, data)
 
 from {{ schema.model.proxies_current_service|package_name }} import {{ schema.model.proxies_current_service|base_name }}
 
