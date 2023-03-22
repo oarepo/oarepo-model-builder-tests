@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 DIR="example_model"
-cd $(dirname $0)
+#cd $(dirname $0)
 if test -d $DIR; then
 	rm -rf $DIR
 fi
@@ -26,15 +26,11 @@ check_or_die $DIR/tests/test_service.py
 
 echo "checking the test files are runnable"
 
-cd $DIR
-python3 -m venv venv
-. venv/bin/activate
+python3 -m venv .model_venv
+. .model_venv/bin/activate
 pip install -U setuptools pip wheel
-pip install -e ".[tests]"
-echo "installing flask fix"
-pip install flask==2.2.3
-echo "testing"
-python tests/conftest.py
-python tests/test_resource.py
-python tests/test_service.py
+pip install -e "$DIR/.[tests]"
+python $DIR/tests/conftest.py
+python $DIR/tests/test_resource.py
+python $DIR/tests/test_service.py
 echo "test passed successfully"
