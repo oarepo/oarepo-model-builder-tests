@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-DIR="example_model"
-#cd $(dirname $0)
+DIR="tests/compiled_model"
+
 if test -d $DIR; then
 	rm -rf $DIR
 fi
@@ -29,7 +29,10 @@ echo "checking the test files are runnable"
 python3 -m venv .model_venv
 . .model_venv/bin/activate
 pip install -U setuptools pip wheel
+pip install 'oarepo>=11.0.26,<12.0.0'
+pip uninstall -y invenio_oauth2server
 pip install -e "$DIR/.[tests]"
+echo "testing"
 python $DIR/tests/conftest.py
 python $DIR/tests/test_resource.py
 python $DIR/tests/test_service.py

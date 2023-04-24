@@ -51,31 +51,6 @@ def app_config(app_config):
     return app_config
 
 
-@pytest.fixture(scope="function")
-def sample_record(app, db, input_data):
-    # record = current_service.create(system_identity, sample_data[0])
-    # return record
-    with UnitOfWork(db.session) as uow:
-        record = {{ schema.model.record_class|base_name }}.create(input_data)
-        uow.register(RecordCommitOp(record, current_service.indexer, True))
-        uow.commit()
-        return record
-
-
-@pytest.fixture(scope="function")
-def sample_records(app, db, sample_metadata_list):
-    # record = current_service.create(system_identity, sample_data[0])
-    # return record
-    with UnitOfWork(db.session) as uow:
-        records = []
-        for sample_metadata in sample_metadata_list:
-            record = {{ schema.model.record_class|base_name }}.create(sample_metadata)
-            uow.register(RecordCommitOp(record, current_service.indexer, True))
-            records.append(record)
-        uow.commit()
-        return records
-
-
 @pytest.fixture()
 def user(app, db):
     """Create example user."""
