@@ -1,7 +1,7 @@
 import datetime
 from invenio_records.dictutils import dict_lookup
-from {{ schema.model.record_resource_config_class|package_name }} import {{ schema.model.record_resource_config_class|base_name }}
-from {{ schema.model.proxies_current_service|package_name }} import {{ schema.model.proxies_current_service|base_name }}
+from {{ current_model.record_resource_config_class|package_name }} import {{ current_model.record_resource_config_class|base_name }}
+from {{ current_model.proxies_current_service|package_name }} import {{ current_model.proxies_current_service|base_name }}
 from invenio_records_permissions.generators import AuthenticatedUser, AnyUser, SystemProcess
 
 def _get_paths(cur_path, cur_val):
@@ -21,7 +21,7 @@ def _get_paths(cur_path, cur_val):
 def get_paths(prefix, data):
     return _get_paths(prefix, data)
 
-BASE_URL = f"http://localhost{{ "{" }} {{ schema.model.record_resource_config_class|base_name }}.url_prefix{{ "}" }}"
+BASE_URL = f"http://localhost{{ "{" }} {{ current_model.record_resource_config_class|base_name }}.url_prefix{{ "}" }}"
 """
 def check_allowed(action_name):
     permission_cls = current_service.config.permission_policy_cls

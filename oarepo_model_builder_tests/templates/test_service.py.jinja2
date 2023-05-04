@@ -22,7 +22,7 @@ def _get_paths(cur_path, cur_val):
 def get_paths(prefix, data):
     return _get_paths(prefix, data)
 
-from {{ schema.model.proxies_current_service|package_name }} import {{ schema.model.proxies_current_service|base_name }}
+from {{ current_model.proxies_current_service|package_name }} import {{ current_model.proxies_current_service|base_name }}
 
 
 def test_read({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}app, db, sample_record, sample_metadata_list, search_clear):
