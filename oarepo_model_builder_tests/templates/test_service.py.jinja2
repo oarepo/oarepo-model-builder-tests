@@ -103,9 +103,18 @@ def test_search(
 
 
     res_fail = list(current_service.search(system_identity, params={"q": "wefrtghthy"}))
+
+    start_datetime = (
+        datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+    ).isoformat() + "Z"
+    end_datetime = (
+        datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+    ).isoformat() + "Z"
+
     res_created = list(
         current_service.search(
-            system_identity, params={"q": str(datetime.datetime.now().date())}
+            system_identity,
+            params={"q": f'created:["{start_datetime}" TO "{end_datetime}"]'},
         )
     )
 
@@ -117,7 +126,9 @@ def test_search(
             system_identity,
             params={
                 "facets": {
-                    "created": [pytz.utc.localize(sample_records[0].created).isoformat()]
+                    "created": [
+                        pytz.utc.localize(sample_records[0].created).isoformat() + "Z"
+                    ]
                 }
             },
         ).hits
@@ -126,7 +137,7 @@ def test_search(
     res_listing = list(current_service.search(system_identity))
 
     assert len(res_fail) == 0
-    assert len(res_listing) == 25
-    assert len(res_created) == 25
+    assert len(res_listing) == 10
+    assert len(res_created) == 10
     assert len(res_created_fail) == 0
     assert len(res_facets) == 1

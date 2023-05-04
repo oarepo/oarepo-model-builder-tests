@@ -99,14 +99,14 @@ def test_create(
 def test_listing({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_records, search_clear):
     listing_response = client_with_credentials.get(BASE_URL)
     hits = listing_response.json["hits"]["hits"]
-    assert len(hits) == 25
+    assert len(hits) == 10
 
 
 def test_update(
     {% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_record, sample_metadata_list, search_clear
 ):
     non_existing = client_with_credentials.put(
-        f"{BASE_URL}yjuykyukyuk", json=sample_metadata_list[15]
+        f"{BASE_URL}yjuykyukyuk", json=sample_metadata_list[5]
     )
 
     old_record_read_response_json = client_with_credentials.get(
@@ -191,15 +191,22 @@ def test_search({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %
                     raise AssertionError("Queried field value not found in search results.")
 
         res_fail = client_with_credentials.get(f"{BASE_URL}?q=wefrtghthy")
+
+        start_datetime = (
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+        ).isoformat() + "Z"
+        end_datetime = (
+            datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+        ).isoformat() + "Z"
+
         res_created = client_with_credentials.get(
-            f"{BASE_URL}?q={str(datetime.datetime.now().date())}"
+            f'{BASE_URL}?q=created:["{start_datetime}" TO "{end_datetime}"]'
         )
         res_created_fail = client_with_credentials.get(f"{BASE_URL}?q=2022-10-16")
-        res_facets = client_with_credentials.get(
-            f"{BASE_URL}?created={sample_records[0].created.isoformat()}"
-        )
+        record_created = sample_records[0].created.isoformat() + "Z"
+        res_facets = client_with_credentials.get(f"{BASE_URL}?created={record_created}")
 
         assert len(res_fail.json["hits"]["hits"]) == 0
-        assert len(res_created.json["hits"]["hits"]) == 25
+        assert len(res_created.json["hits"]["hits"]) == 10
         assert len(res_created_fail.json["hits"]["hits"]) == 0
         assert len(res_facets.json["hits"]["hits"]) == 1
