@@ -33,4 +33,5 @@ pip install -e "$DIR/.[tests]"
 python $DIR/tests/conftest.py
 python $DIR/tests/test_resource.py
 python $DIR/tests/test_service.py
+pytest $DIR/tests/
 echo "test passed successfully"

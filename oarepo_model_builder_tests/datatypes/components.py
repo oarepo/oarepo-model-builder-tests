@@ -20,7 +20,7 @@ class TestSchema(ma.Schema):
         load_default=""
     )
 
-    module = ma.fields.String(load_default='test')
+    module = ma.fields.String(load_default='tests')
 
 class ModelTestComponent(DataTypeComponent):
     eligible_datatypes = [ModelDataType]
