@@ -1,7 +1,7 @@
 import datetime
 from invenio_records.dictutils import dict_lookup
-from {{ current_model.record_resource_config_class|package_name }} import {{ current_model.record_resource_config_class|base_name }}
-from {{ current_model.proxies_current_service|package_name }} import {{ current_model.proxies_current_service|base_name }}
+{{ vars.resource_config.class|generate_import }}
+from {{ vars.proxy.module }} import {{ vars.service.proxy }}
 from invenio_records_permissions.generators import AuthenticatedUser, AnyUser, SystemProcess
 
 def _get_paths(cur_path, cur_val):
@@ -21,17 +21,17 @@ def _get_paths(cur_path, cur_val):
 def get_paths(prefix, data):
     return _get_paths(prefix, data)
 
-BASE_URL = f"http://localhost{{ "{" }} {{ current_model.record_resource_config_class|base_name }}.url_prefix{{ "}" }}"
+BASE_URL = f"http://localhost{{ "{" }} {{ vars.resource_config.class|base_name }}.url_prefix{{ "}" }}"
 """
 def check_allowed(action_name):
-    permission_cls = current_service.config.permission_policy_cls
+    permission_cls = {{ vars.service.proxy }}.config.permission_policy_cls
     permission = permission_cls(action_name)
     identity = g.identity
     auth = permission.allows(identity)
     return auth
 """
 def is_action_allowed(action_name, user_is_auth):
-    permission_cls = current_service.config.permission_policy_cls
+    permission_cls = {{ vars.service.proxy }}.config.permission_policy_cls
     permission = permission_cls(action_name)
     action_name = f"can_{action_name}"
     action_permissions = getattr(permission, action_name, [])
@@ -57,7 +57,7 @@ def response_code_ok(action_name, user_is_auth, response, authorized_response_co
     return False
 
 
-def test_get_item({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_record, search_clear):
+def test_get_item({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_record, search_clear):
     non_existing = client_with_credentials.get(f"{BASE_URL}yjuykyukyuk")
     assert non_existing.status_code == 404
 
@@ -68,7 +68,7 @@ def test_get_item({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor
 
 
 def test_create(
-    {% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, client, sample_metadata_list, app, search_clear
+    {{ vars.tests.extra_fixtures|generate_list(end=true) }}client_with_credentials, client, sample_metadata_list, app, search_clear
 ):
     created_responses = []
     for sample_metadata_point in sample_metadata_list:
@@ -96,14 +96,14 @@ def test_create(
             )
 
 
-def test_listing({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_records, search_clear):
+def test_listing({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, search_clear):
     listing_response = client_with_credentials.get(BASE_URL)
     hits = listing_response.json["hits"]["hits"]
     assert len(hits) == 10
 
 
 def test_update(
-    {% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_record, sample_metadata_list, search_clear
+    {{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_record, sample_metadata_list, search_clear
 ):
     non_existing = client_with_credentials.put(
         f"{BASE_URL}yjuykyukyuk", json=sample_metadata_list[5]
@@ -148,7 +148,7 @@ def test_update(
     #                                                              "value": "UPDATED!"})
 
 
-def test_delete({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_record, app, search_clear):
+def test_delete({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_record, app, search_clear):
     non_existing = client_with_credentials.delete(f"{BASE_URL}yjuykyukyuk")
     assert response_code_ok("delete", True, non_existing, 404)
 
@@ -173,7 +173,7 @@ def test_delete_unauth(sample_record, search_clear, app):
 
 
 
-def test_search({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}client_with_credentials, sample_records, sample_metadata_list, search_clear):
+def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, sample_metadata_list, search_clear):
     if is_action_allowed("search", True):
         paths = get_paths("metadata", sample_metadata_list[0]["metadata"])
 

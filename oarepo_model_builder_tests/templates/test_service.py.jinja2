@@ -4,6 +4,8 @@ from invenio_records.dictutils import dict_lookup
 from invenio_access.permissions import system_identity
 from invenio_pidstore.errors import PIDDoesNotExistError, PIDDeletedError
 import datetime
+from {{ vars.proxy.module }} import {{ vars.service.proxy }}
+
 
 def _get_paths(cur_path, cur_val):
     ret_paths = []
@@ -22,17 +24,15 @@ def _get_paths(cur_path, cur_val):
 def get_paths(prefix, data):
     return _get_paths(prefix, data)
 
-from {{ current_model.proxies_current_service|package_name }} import {{ current_model.proxies_current_service|base_name }}
 
-
-def test_read({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}app, db, sample_record, sample_metadata_list, search_clear):
+def test_read({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_record, sample_metadata_list, search_clear):
     with pytest.raises(PIDDoesNotExistError):
         current_service.read(system_identity, "fwegthi8op")
     read_record = current_service.read(system_identity, sample_record["id"])
     assert read_record.data["metadata"] == sample_record.metadata
 
 
-def test_create({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}app, db, sample_metadata_list, search_clear):
+def test_create({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_metadata_list, search_clear):
     created_records = []
     for sample_metadata_point in sample_metadata_list:
         created_records.append(
@@ -49,7 +49,7 @@ def test_create({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %
         )
 
 
-def test_update({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}app, db, sample_record, sample_metadata_list, search_clear):
+def test_update({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_record, sample_metadata_list, search_clear):
     with pytest.raises(PIDDoesNotExistError):
         current_service.update(
             system_identity, "fwsegerhjtyuk754dh", sample_metadata_list[2]
@@ -74,7 +74,7 @@ def test_update({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %
     )
 
 
-def test_delete({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}app, db, sample_record, search_clear):
+def test_delete({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_record, search_clear):
     with pytest.raises(PIDDoesNotExistError):
         current_service.delete(system_identity, "fwsegerhjtyuk754dh")
 
@@ -86,7 +86,7 @@ def test_delete({% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %
 
 
 def test_search(
-    {% for ef in current_model.extra_fixtures %}{{ ef }},{% endfor %}app, db, sample_records, sample_metadata_list, search_clear
+    {{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_records, sample_metadata_list, search_clear
 ):
     paths = get_paths("metadata", sample_metadata_list[0]["metadata"])
 

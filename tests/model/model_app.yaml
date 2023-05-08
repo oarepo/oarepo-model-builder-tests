@@ -1,4 +1,4 @@
-model:
+record:
   properties:
     metadata:
       properties:
@@ -10,5 +10,7 @@ model:
           type: fulltext+keyword
   use:
     - invenio
-  package: ron_model
+  module:
+    qualified: ron_model
+settings:
   schema-server: 'local://'

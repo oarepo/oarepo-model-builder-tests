@@ -10,13 +10,13 @@ from invenio_app.factory import create_api
 from invenio_records_resources.services.uow import UnitOfWork, RecordCommitOp
 import os
 
-from {{ current_model.proxies_current_service|package_name }} import {{ current_model.proxies_current_service|base_name }}
-from {{ current_model.record_class|package_name }} import {{ current_model.record_class|base_name }}
+from {{ vars.proxy.module }} import {{ vars.service.proxy }}
+{{ vars.record.class|generate_import }}
 
 
 @pytest.fixture(scope="function")
 def sample_metadata_list():
-    data_path = f"{Path(__file__).parent.parent}/data/sample_data.yaml"
+    data_path = f"{Path(__file__).parent.parent}/{{ vars.sample.file }}"
     docs = list(yaml.load_all(open(data_path), Loader=yaml.SafeLoader))
     return docs
 
@@ -53,24 +53,24 @@ def app_config(app_config):
 
 @pytest.fixture(scope="function")
 def sample_record(app, db, input_data):
-    # record = current_service.create(system_identity, sample_data[0])
+    # record = {{ vars.service.proxy }}.create(system_identity, sample_data[0])
     # return record
     with UnitOfWork(db.session) as uow:
-        record = {{ current_model.record_class|base_name }}.create(input_data)
-        uow.register(RecordCommitOp(record, current_service.indexer, True))
+        record = {{ vars.record.class|base_name }}.create(input_data)
+        uow.register(RecordCommitOp(record, {{ vars.service.proxy }}.indexer, True))
         uow.commit()
         return record
 
 
 @pytest.fixture(scope="function")
 def sample_records(app, db, sample_metadata_list):
-    # record = current_service.create(system_identity, sample_data[0])
+    # record = {{ vars.service.proxy }}.create(system_identity, sample_data[0])
     # return record
     with UnitOfWork(db.session) as uow:
         records = []
         for sample_metadata in sample_metadata_list:
-            record = {{ current_model.record_class|base_name }}.create(sample_metadata)
-            uow.register(RecordCommitOp(record, current_service.indexer, True))
+            record = {{ vars.record.class|base_name }}.create(sample_metadata)
+            uow.register(RecordCommitOp(record, {{ vars.service.proxy }}.indexer, True))
             records.append(record)
         uow.commit()
         return records
@@ -113,3 +113,5 @@ def client_with_credentials(db, client, user, role, sample_metadata_list):
     login_user_via_session(client, email=user.email)
 
     return client
+
+{{ vars.tests.extra_code }}
