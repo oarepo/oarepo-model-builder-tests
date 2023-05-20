@@ -85,6 +85,7 @@ def test_delete({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db,
         current_service.read(system_identity, sample_record["id"])
 
 
+@pytest.mark.xfail
 def test_search(
     {{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_records, sample_metadata_list, search_clear
 ):

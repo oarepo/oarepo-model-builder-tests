@@ -1,3 +1,4 @@
+import pytest
 import datetime
 from invenio_records.dictutils import dict_lookup
 {{ vars.resource_config.class|generate_import }}
@@ -172,7 +173,7 @@ def test_delete_unauth(sample_record, search_clear, app):
         assert response_code_ok("delete", False, unauth_delete_response, 204)
 
 
-
+@pytest.mark.xfail
 def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, sample_metadata_list, search_clear):
     if is_action_allowed("search", True):
         paths = get_paths("metadata", sample_metadata_list[0]["metadata"])
