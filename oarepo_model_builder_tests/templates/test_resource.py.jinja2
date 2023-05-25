@@ -1,5 +1,6 @@
 import pytest
 import datetime
+from urllib.parse import urlencode
 from invenio_records.dictutils import dict_lookup
 {{ vars.resource_config.class|generate_import }}
 from {{ vars.proxy.module }} import {{ vars.service.proxy }}
@@ -173,7 +174,6 @@ def test_delete_unauth(sample_record, search_clear, app):
         assert response_code_ok("delete", False, unauth_delete_response, 204)
 
 
-@pytest.mark.xfail
 def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, sample_metadata_list, search_clear):
     if is_action_allowed("search", True):
         paths = get_paths("metadata", sample_metadata_list[0]["metadata"])
@@ -181,9 +181,12 @@ def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_w
         for record in sample_records:
             for path in paths:
                 field_value = dict_lookup(record, path)
-                path_search_results = client_with_credentials.get(
-                    f'{BASE_URL}?q={path}:"{field_value}"'
-                ).json["hits"]["hits"]
+                encoded_query = urlencode({'q': f'{path}:"{field_value}"'})
+                path_search_response = client_with_credentials.get(
+                    f'{BASE_URL}?{encoded_query}'
+                )
+                assert path_search_response.status_code == 200
+                path_search_results = path_search_response.json["hits"]["hits"]
                 assert len(path_search_results) > 0
                 for field_result in [dict_lookup(res, path) for res in path_search_results]:
                     if field_result == field_value:
@@ -200,9 +203,12 @@ def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_w
             datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
         ).isoformat() + "Z"
 
+
+        encoded_query = urlencode({'q': f'created:["{start_datetime}" TO "{end_datetime}"]'})
         res_created = client_with_credentials.get(
-            f'{BASE_URL}?q=created:["{start_datetime}" TO "{end_datetime}"]'
+            f'{BASE_URL}?{encoded_query}'
         )
+
         res_created_fail = client_with_credentials.get(f"{BASE_URL}?q=2022-10-16")
         record_created = sample_records[0].created.isoformat() + "Z"
         res_facets = client_with_credentials.get(f"{BASE_URL}?created={record_created}")
