@@ -13,6 +13,9 @@ import os
 from {{ vars.proxy.module }} import {{ vars.service.proxy }}
 {{ vars.record.class|generate_import }}
 
+@pytest.fixture
+def record_service():
+    return current_service
 
 @pytest.fixture(scope="function")
 def sample_metadata_list():

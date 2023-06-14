@@ -24,12 +24,19 @@ def _get_paths(cur_path, cur_val):
 def get_paths(prefix, data):
     return _get_paths(prefix, data)
 
-
-def test_read({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_record, sample_metadata_list, search_clear):
+"""
+def test_read({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, {{ fixtures.sample_record }}, sample_metadata_list, search_clear):
     with pytest.raises(PIDDoesNotExistError):
         current_service.read(system_identity, "fwegthi8op")
-    read_record = current_service.read(system_identity, sample_record["id"])
-    assert read_record.data["metadata"] == sample_record.metadata
+    read_record = current_service.read(system_identity, {{ fixtures.sample_record }}["id"])
+    assert read_record.data["metadata"] == {{ fixtures.sample_record }}.metadata
+"""
+
+def test_read({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, {{ fixtures.sample_record }}, {{ fixtures.record_service }}, sample_metadata_list, search_clear):
+    with pytest.raises(PIDDoesNotExistError):
+        {{ fixtures.record_service }}.read(system_identity, "fwegthi8op")
+    read_record = {{ fixtures.record_service }}.read(system_identity, {{ fixtures.sample_record }}["id"])
+    assert read_record.data["metadata"] == {{ fixtures.sample_record }}.metadata
 
 
 def test_create({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_metadata_list, search_clear):
@@ -49,18 +56,18 @@ def test_create({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db,
         )
 
 
-def test_update({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_record, sample_metadata_list, search_clear):
+def test_update(app, db, {{ fixtures.sample_record }}, sample_metadata_list, search_clear):
     with pytest.raises(PIDDoesNotExistError):
         current_service.update(
             system_identity, "fwsegerhjtyuk754dh", sample_metadata_list[2]
         )
 
-    old_record_data = current_service.read(system_identity, sample_record["id"]).data
+    old_record_data = current_service.read(system_identity, {{ fixtures.sample_record }}["id"]).data
     updated_record = current_service.update(
-        system_identity, sample_record["id"], sample_metadata_list[2]
+        system_identity, {{ fixtures.sample_record }}["id"], sample_metadata_list[2]
     )
-    updated_record_read = current_service.read(system_identity, sample_record["id"])
-    assert old_record_data["metadata"] == sample_record["metadata"]
+    updated_record_read = current_service.read(system_identity, {{ fixtures.sample_record }}["id"])
+    assert old_record_data["metadata"] == {{ fixtures.sample_record }}["metadata"]
     assert (
         updated_record.data["metadata"]
         == sample_metadata_list[2]["metadata"]
@@ -74,19 +81,19 @@ def test_update({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db,
     )
 
 
-def test_delete({{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_record, search_clear):
+def test_delete(app, db, {{ fixtures.sample_record }}, search_clear):
     with pytest.raises(PIDDoesNotExistError):
         current_service.delete(system_identity, "fwsegerhjtyuk754dh")
 
-    to_delete_record = current_service.read(system_identity, sample_record["id"])
+    to_delete_record = current_service.read(system_identity, {{ fixtures.sample_record }}["id"])
     assert to_delete_record
-    current_service.delete(system_identity, sample_record["id"])
+    current_service.delete(system_identity, {{ fixtures.sample_record }}["id"])
     with pytest.raises(PIDDeletedError):
-        current_service.read(system_identity, sample_record["id"])
+        current_service.read(system_identity, {{ fixtures.sample_record }}["id"])
 
-
+{% if not test_constants.skip_search_test %}
 def test_search(
-    {{ vars.tests.extra_fixtures|generate_list(end=true) }} app, db, sample_records, sample_metadata_list, search_clear
+    app, db, sample_records, sample_metadata_list, search_clear
 ):
     paths = get_paths("metadata", sample_metadata_list[0]["metadata"])
 
@@ -141,3 +148,4 @@ def test_search(
     assert len(res_created) == 10
     assert len(res_created_fail) == 0
     assert len(res_facets) == 1
+{% endif %}
