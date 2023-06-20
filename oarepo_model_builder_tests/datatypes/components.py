@@ -61,7 +61,12 @@ class ModelTestComponent(DataTypeComponent):
             "update_url": "",
             "delete_url": "",
             "deleted_http_code": 410,
-            "skip_search_test": False
+            "skip_search_test": False,
+            "service_read_method": "read",
+            "service_create_method": "create",
+            "service_delete_method": "delete",
+            "service_update_method": "update",
+            "deleted_record_pid_error" : "PIDDeletedError"
         }
 
 
