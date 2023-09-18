@@ -252,3 +252,36 @@ def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_w
         assert len(res_created_fail.json["hits"]["hits"]) == 0
         assert len(res_facets.json["hits"]["hits"]) == 1
 {% endif %}
+
+
+def assert_expected_links(pid_value, generated_links, site_hostname="127.0.0.1:5000"):
+    """Compare generated links to expected links."""
+    required_links = {
+        {% for link_name, link in test_constants.links.items() %}
+        "{{ link_name }}": f"{{ link }}",
+        {% endfor %}
+    }
+    assert required_links.items() <= generated_links.items()
+
+
+def test_create_links(app, client_with_credentials, input_data):
+    res = client_with_credentials.post(BASE_URL, json=input_data)
+
+    pid_value = res.json["id"]
+    assert_expected_links(pid_value, res.json["links"])
+
+
+def test_read_links(app, client_with_credentials, {{ fixtures.sample_record }}):
+    pid_value = {{ fixtures.sample_record }}['id']
+    res = client_with_credentials.get(f"{BASE_URL}{pid_value}{{ test_constants.read_url }}")
+
+    assert_expected_links(pid_value, res.json["links"])
+
+
+def test_update_links(app, client_with_credentials, {{ fixtures.sample_record }}, sample_metadata_list):
+    pid_value = {{ fixtures.sample_record }}['id']
+    res = client_with_credentials.get(f"{BASE_URL}{pid_value}{{ test_constants.read_url }}")
+    res = client_with_credentials.put(f"{BASE_URL}{pid_value}{{ test_constants.update_url }}", json=sample_metadata_list[1])
+
+    assert res.status_code == 200
+    assert_expected_links(pid_value, res.json["links"])
