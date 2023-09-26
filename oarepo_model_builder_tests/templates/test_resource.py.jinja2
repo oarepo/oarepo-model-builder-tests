@@ -24,6 +24,7 @@ def get_paths(prefix, data):
     return _get_paths(prefix, data)
 
 BASE_URL = {{ vars.resource_config.class|base_name }}.url_prefix
+BASE_HTML_URL = "{{ vars.resource_config.base_html_url }}"
 """
 def check_allowed(action_name):
     permission_cls = {{ vars.service.proxy }}.config.permission_policy_cls
