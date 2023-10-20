@@ -2,7 +2,6 @@ import pytest
 import datetime
 from urllib.parse import urlencode
 from invenio_records.dictutils import dict_lookup
-{{ vars.resource_config.class|generate_import }}
 from {{ vars.proxy.module }} import {{ vars.service.proxy }}
 from invenio_records_permissions.generators import AuthenticatedUser, AnyUser, SystemProcess
 
@@ -23,8 +22,6 @@ def _get_paths(cur_path, cur_val):
 def get_paths(prefix, data):
     return _get_paths(prefix, data)
 
-BASE_URL = {{ vars.resource_config.class|base_name }}.url_prefix
-BASE_HTML_URL = "{{ vars.resource_config.base_html_url }}"
 """
 def check_allowed(action_name):
     permission_cls = {{ vars.service.proxy }}.config.permission_policy_cls
@@ -60,26 +57,26 @@ def response_code_ok(action_name, user_is_auth, response, authorized_response_co
     return False
 
 
-def test_read(client_with_credentials, {{ fixtures.sample_record }}, search_clear):
-    non_existing = client_with_credentials.get(f"{BASE_URL}yjuykyukyuk")
+def test_read(client_with_credentials, {{ fixtures.sample_record }}, search_clear, base_urls):
+    non_existing = client_with_credentials.get(f"{base_urls['base_url']}yjuykyukyuk")
     assert non_existing.status_code == 404
 
-    get_response = client_with_credentials.get(f"{BASE_URL}{{ "{" }}{{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.read_url }}")
+    get_response = client_with_credentials.get(f"{base_urls['base_url']}{{ "{" }}{{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.read_url }}")
     assert response_code_ok("read", True, get_response, 200)
     if is_action_allowed("read", True):
         assert get_response.json["metadata"] == {{ fixtures.sample_record }}["metadata"]
 
 def test_create(
-    client_with_credentials, client, sample_metadata_list, app, search_clear
+    client_with_credentials, client, sample_metadata_list, app, search_clear, base_urls
 ):
     created_responses = []
     for sample_metadata_point in sample_metadata_list:
         created_responses.append(
-            client_with_credentials.post(f"{BASE_URL}", json=sample_metadata_point)
+            client_with_credentials.post(f"{base_urls['base_url']}", json=sample_metadata_point)
         )
         with app.test_client() as unauth_client:
             unauth_response = unauth_client.post(
-                f"{BASE_URL}", json=sample_metadata_point
+                f"{base_urls['base_url']}", json=sample_metadata_point
             )
             assert response_code_ok("create", False, unauth_response, 201)
     assert all(
@@ -94,7 +91,7 @@ def test_create(
             sample_metadata_list, created_responses
         ):
             created_response_reread = client_with_credentials.get(
-                f"{BASE_URL}{created_response.json['id']}{{ test_constants.read_url }}"
+                f"{base_urls['base_url']}{created_response.json['id']}{{ test_constants.read_url }}"
             )
             assert response_code_ok("read", True, created_response_reread, 200)
             assert (
@@ -104,16 +101,16 @@ def test_create(
 
 """
 def test_create(
-    {{ vars.tests.extra_fixtures|generate_list(end=true) }}client_with_credentials, client, sample_metadata_list, app, search_clear
+    {{ vars.tests.extra_fixtures|generate_list(end=true) }}client_with_credentials, client, sample_metadata_list, app, search_clear, base_urls
 ):
     created_responses = []
     for sample_metadata_point in sample_metadata_list:
         created_responses.append(
-            client_with_credentials.post(f"{BASE_URL}", json=sample_metadata_point)
+            client_with_credentials.post(f"{base_urls['base_url']}", json=sample_metadata_point)
         )
         with app.test_client() as unauth_client:
             unauth_response = unauth_client.post(
-                f"{BASE_URL}", json=sample_metadata_point
+                f"{base_urls['base_url']}", json=sample_metadata_point
             )
             assert response_code_ok("create", False, unauth_response, 201)
     assert all([response_code_ok("create", True, new_response, 201) for new_response in created_responses])
@@ -123,7 +120,7 @@ def test_create(
             sample_metadata_list, created_responses
         ):
             created_response_reread = client_with_credentials.get(
-                f"{BASE_URL}{created_response.json['id']}"
+                f"{base_urls['base_url']}{created_response.json['id']}"
             )
             assert response_code_ok("read", True, created_response_reread, 200)
             assert (
@@ -133,30 +130,30 @@ def test_create(
 """
 
 """
-def test_listing({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, search_clear):
-    listing_response = client_with_credentials.get(BASE_URL)
+def test_listing({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, search_clear, base_urls):
+    listing_response = client_with_credentials.get(base_urls['base_url'])
     hits = listing_response.json["hits"]["hits"]
     assert len(hits) == 10
 """
 
 
 def test_update(
-    client_with_credentials, {{ fixtures.sample_record }}, sample_metadata_list, search_clear
+    client_with_credentials, {{ fixtures.sample_record }}, sample_metadata_list, search_clear, base_urls
 ):
     non_existing = client_with_credentials.put(
-        f"{BASE_URL}yjuykyukyuk{{ test_constants.read_url }}", json=sample_metadata_list[5]
+        f"{base_urls['base_url']}yjuykyukyuk{{ test_constants.read_url }}", json=sample_metadata_list[5]
     )
 
     old_record_read_response_json = client_with_credentials.get(
-        f"{BASE_URL}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.read_url }}"
+        f"{base_urls['base_url']}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.read_url }}"
     ).json
 
     update_response = client_with_credentials.put(
-        f"{BASE_URL}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.update_url }}", json=sample_metadata_list[2]
+        f"{base_urls['base_url']}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.update_url }}", json=sample_metadata_list[2]
     )
 
     updated_record_read_response = client_with_credentials.get(
-        f"{BASE_URL}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.read_url }}"
+        f"{base_urls['base_url']}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.read_url }}"
     )
 
     assert response_code_ok("read", True, updated_record_read_response, 200)
@@ -180,36 +177,36 @@ def test_update(
 
     # test patch - 405 METHOD NOT ALLOWED
     # to make it work change create_url_rules in resource and allow jsonpatch in request_body_parsers in resource config
-    # patch_response = client_with_credentials.patch(f"{BASE_URL}{sample_record['id']}",
+    # patch_response = client_with_credentials.patch(f"{base_urls['base_url']}{sample_record['id']}",
     #                                                              json={"path": "/metadata/title",
     #                                                              "op": "replace",
     #                                                              "value": "UPDATED!"})
 
 
-def test_delete(client_with_credentials, {{ fixtures.sample_record }}, app, search_clear):
-    non_existing = client_with_credentials.delete(f"{BASE_URL}yjuykyukyuk")
+def test_delete(client_with_credentials, {{ fixtures.sample_record }}, app, search_clear, base_urls):
+    non_existing = client_with_credentials.delete(f"{base_urls['base_url']}yjuykyukyuk")
     assert response_code_ok("delete", True, non_existing, 404)
 
-    delete_response = client_with_credentials.delete(f"{BASE_URL}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.delete_url }}")
+    delete_response = client_with_credentials.delete(f"{base_urls['base_url']}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.delete_url }}")
     assert response_code_ok("delete", True, delete_response, 204)
 
     if is_action_allowed("delete", True):
         deleted_get_response = client_with_credentials.delete(
-            f"{BASE_URL}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.delete_url }}"
+            f"{base_urls['base_url']}{{ "{" }} {{ fixtures.sample_record }}['id']{{ "}" }}{{ test_constants.delete_url }}"
         )
         assert deleted_get_response.status_code == {{ test_constants.deleted_http_code }}
 
 """
-def test_delete_unauth(sample_record, search_clear, app):
+def test_delete_unauth(sample_record, search_clear, app, base_urls):
     with app.test_client() as unauth_client:
         unauth_delete_response = unauth_client.delete(
-            f"{BASE_URL}{sample_record['id']}"
+            f"{base_urls['base_url']}{sample_record['id']}"
         )
         assert response_code_ok("delete", False, unauth_delete_response, 204)
 """
 
 {% if not test_constants.skip_search_test %}
-def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, sample_metadata_list, search_clear):
+def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, sample_metadata_list, search_clear, base_urls):
     if is_action_allowed("search", True):
         paths = get_paths("metadata", sample_metadata_list[0]["metadata"])
 
@@ -218,7 +215,7 @@ def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_w
                 field_value = dict_lookup(record, path)
                 encoded_query = urlencode({'q': f'{path}:"{field_value}"'})
                 path_search_response = client_with_credentials.get(
-                    f'{BASE_URL}?{encoded_query}'
+                    f"{base_urls['base_url']}?{encoded_query}"
                 )
                 assert path_search_response.status_code == 200
                 path_search_results = path_search_response.json["hits"]["hits"]
@@ -229,7 +226,7 @@ def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_w
                 else:
                     raise AssertionError("Queried field value not found in search results.")
 
-        res_fail = client_with_credentials.get(f"{BASE_URL}?q=wefrtghthy")
+        res_fail = client_with_credentials.get(f"{base_urls['base_url']}?q=wefrtghthy")
 
         start_datetime = (
             datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
@@ -241,12 +238,12 @@ def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_w
 
         encoded_query = urlencode({'q': f'created:["{start_datetime}" TO "{end_datetime}"]'})
         res_created = client_with_credentials.get(
-            f'{BASE_URL}?{encoded_query}'
+            f"{base_urls['base_url']}?{encoded_query}"
         )
 
-        res_created_fail = client_with_credentials.get(f"{BASE_URL}?q=2022-10-16")
+        res_created_fail = client_with_credentials.get(f"{base_urls['base_url']}?q=2022-10-16")
         record_created = sample_records[0].created.isoformat() + "Z"
-        res_facets = client_with_credentials.get(f"{BASE_URL}?created={record_created}")
+        res_facets = client_with_credentials.get(f"{base_urls['base_url']}?created={record_created}")
 
         assert len(res_fail.json["hits"]["hits"]) == 0
         assert len(res_created.json["hits"]["hits"]) == 10
@@ -255,7 +252,7 @@ def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_w
 {% endif %}
 
 
-def assert_expected_links(pid_value, generated_links, site_hostname="127.0.0.1:5000"):
+def assert_expected_links(pid_value, generated_links, base_urls, site_hostname="127.0.0.1:5000"):
     """Compare generated links to expected links."""
     required_links = {
         {% for link_name, link in test_constants.links.items() %}
@@ -265,24 +262,24 @@ def assert_expected_links(pid_value, generated_links, site_hostname="127.0.0.1:5
     assert required_links.items() <= generated_links.items()
 
 
-def test_create_links(app, client_with_credentials, input_data):
-    res = client_with_credentials.post(BASE_URL, json=input_data)
+def test_create_links(app, client_with_credentials, input_data, base_urls):
+    res = client_with_credentials.post(base_urls['base_url'], json=input_data)
 
     pid_value = res.json["id"]
-    assert_expected_links(pid_value, res.json["links"])
+    assert_expected_links(pid_value, res.json["links"], base_urls)
 
 
-def test_read_links(app, client_with_credentials, {{ fixtures.sample_record }}):
+def test_read_links(app, client_with_credentials, {{ fixtures.sample_record }}, base_urls):
     pid_value = {{ fixtures.sample_record }}['id']
-    res = client_with_credentials.get(f"{BASE_URL}{pid_value}{{ test_constants.read_url }}")
+    res = client_with_credentials.get(f"{base_urls['base_url']}{pid_value}{{ test_constants.read_url }}")
 
-    assert_expected_links(pid_value, res.json["links"])
+    assert_expected_links(pid_value, res.json["links"], base_urls)
 
 
-def test_update_links(app, client_with_credentials, {{ fixtures.sample_record }}, sample_metadata_list):
+def test_update_links(app, client_with_credentials, {{ fixtures.sample_record }}, sample_metadata_list, base_urls):
     pid_value = {{ fixtures.sample_record }}['id']
-    res = client_with_credentials.get(f"{BASE_URL}{pid_value}{{ test_constants.read_url }}")
-    res = client_with_credentials.put(f"{BASE_URL}{pid_value}{{ test_constants.update_url }}", json=sample_metadata_list[1])
+    res = client_with_credentials.get(f"{base_urls['base_url']}{pid_value}{{ test_constants.read_url }}")
+    res = client_with_credentials.put(f"{base_urls['base_url']}{pid_value}{{ test_constants.update_url }}", json=sample_metadata_list[1])
 
     assert res.status_code == 200
-    assert_expected_links(pid_value, res.json["links"])
+    assert_expected_links(pid_value, res.json["links"], base_urls)

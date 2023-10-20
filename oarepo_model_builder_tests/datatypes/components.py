@@ -68,7 +68,7 @@ class ModelTestComponent(DataTypeComponent):
             "service_update_method": "update",
             "deleted_record_pid_error" : "PIDDeletedError",
             "links": {
-                "self": "https://{site_hostname}/api{BASE_URL}{pid_value}",
+                "self": "https://{site_hostname}/api{base_urls['base_url']}{pid_value}",
             }
         }
 
