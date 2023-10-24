@@ -11,9 +11,6 @@ ui and entrypoints for draft files
 """
 
 
-
-
-
 class TestSchema(ma.Schema):
     class Meta:
         unknown = ma.RAISE
@@ -33,8 +30,6 @@ class TestSchema(ma.Schema):
     module = ma.fields.String(load_default="tests")
 
     disabled = ma.fields.List(ma.fields.String())
-
-
 
 
 class ModelTestComponent(DataTypeComponent):
@@ -66,12 +61,11 @@ class ModelTestComponent(DataTypeComponent):
             "service_create_method": "create",
             "service_delete_method": "delete",
             "service_update_method": "update",
-            "deleted_record_pid_error" : "PIDDeletedError",
+            "deleted_record_pid_error": "PIDDeletedError",
             "links": {
-                "self": "https://{site_hostname}/api{BASE_URL}{pid_value}",
-            }
+                "self": "https://{site_hostname}/api{base_urls['base_url']}{pid_value}",
+            },
         }
-
 
 
 components = [ModelTestComponent]

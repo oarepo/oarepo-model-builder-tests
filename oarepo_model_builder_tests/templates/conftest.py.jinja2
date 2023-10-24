@@ -10,8 +10,34 @@ from invenio_app.factory import create_api
 from invenio_records_resources.services.uow import UnitOfWork, RecordCommitOp
 import os
 
+{{ vars.resource_config.class|generate_import }}
 from {{ vars.proxy.module }} import {{ vars.service.proxy }}
 {{ vars.record.class|generate_import }}
+
+BASE_URLS = {
+        "base_url": {{ vars.resource_config.class|base_name }}.url_prefix,
+        "base_html_url": "{{ vars.resource_config.base_html_url }}"
+}
+
+APP_CONFIG = {
+    "JSONSCHEMAS_HOST" : "localhost",
+    "RECORDS_REFRESOLVER_CLS": "invenio_records.resolver.InvenioRefResolver",
+    "RECORDS_REFRESOLVER_STORE": "invenio_jsonschemas.proxies.current_refresolver_store",
+    "RATELIMIT_AUTHENTICATED_USER": "200 per second",
+    "SEARCH_HOSTS": [
+        {
+            'host': os.environ.get('OPENSEARCH_HOST', 'localhost'),
+            'port': os.environ.get('OPENSEARCH_PORT', '9200'),
+        }
+    ],
+    # disable redis cache
+    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 300,
+}
+
+@pytest.fixture
+def base_urls():
+    return BASE_URLS
 
 @pytest.fixture
 def record_service():
@@ -36,24 +62,8 @@ def create_app(instance_path, entry_points):
 
 @pytest.fixture(scope="module")
 def app_config(app_config):
-    """Mimic an instance's configuration."""
-    app_config["JSONSCHEMAS_HOST"] = "localhost"
-    app_config[
-        "RECORDS_REFRESOLVER_CLS"
-    ] = "invenio_records.resolver.InvenioRefResolver"
-    app_config[
-        "RECORDS_REFRESOLVER_STORE"
-    ] = "invenio_jsonschemas.proxies.current_refresolver_store"
-    app_config["RATELIMIT_AUTHENTICATED_USER"] = "200 per second"
-    app_config["SEARCH_HOSTS"] = [
-        {
-            'host': os.environ.get('OPENSEARCH_HOST', 'localhost'),
-            'port': os.environ.get('OPENSEARCH_PORT', '9200'),
-        }
-    ]
-    # disable redis cache
-    app_config["CACHE_TYPE"] = "SimpleCache"  # Flask-Caching related configs
-    app_config["CACHE_DEFAULT_TIMEOUT"] = 300
+    for k, v in APP_CONFIG.items():
+        app_config[k] = v
     return app_config
 
 
