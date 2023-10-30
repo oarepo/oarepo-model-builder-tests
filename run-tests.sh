@@ -1,5 +1,19 @@
 #!/bin/bash
 set -e
+
+OAREPO_VERSION=${OAREPO_VERSION:-11}
+OAREPO_VERSION_MAX=$((OAREPO_VERSION+1))
+
+if [ -d .venv-builder ] ; then
+    rm -rf .venv-builder
+fi
+
+python3 -m venv .venv-builder
+source .venv-builder/bin/activate
+.venv-builder/bin/pip install -U setuptools pip wheel
+.venv-builder/bin/pip install -e .
+
+
 DIR="example_model"
 #cd $(dirname $0)
 if test -d $DIR; then
@@ -26,9 +40,16 @@ check_or_die $DIR/tests/test_service.py
 
 echo "checking the test files are runnable"
 
-python3 -m venv .model_venv
-. .model_venv/bin/activate
+deactivate
+
+if [ -d .venv-model ] ; then
+    rm -rf .venv-model
+fi
+
+python3 -m venv .venv-model
+. .venv-model/bin/activate
 pip install -U setuptools pip wheel
+pip install "oarepo>=$OAREPO_VERSION,<$OAREPO_VERSION_MAX"
 pip install -e "$DIR/.[tests]"
 python $DIR/tests/conftest.py
 python $DIR/tests/test_resource.py
