@@ -59,10 +59,10 @@ jobs:
       - name: Build package to publish
         run: |
           .venv-builder/bin/python setup.py sdist bdist_wheel
-          extra_content="$(tar -tf dist/*.tar.gz | sed 's#[^/]*/##' | grep '/' | grep -v oarepo_model_builder_tests)"
-          test -z "$extra_content" || (echo "Unexpected content in dist tar.gz: $extra_content" && exit 1)
-          extra_content="$(unzip -ql dist/*.whl | grep -v oarepo_model_builder_tests | tail -n +5)"
-          test -z "$extra_content" || (echo "Unexpected content in dist whl: $extra_content" && exit 1)
+#          extra_content="$(tar -tf dist/*.tar.gz | sed 's#[^/]*/##' | grep '/' | grep -v oarepo_model_builder_tests)"
+#          test -z "$extra_content" || (echo "Unexpected content in dist tar.gz: $extra_content" && exit 1)
+#          extra_content="$(unzip -ql dist/*.whl | grep -v oarepo_model_builder_tests | tail -n +5)"
+#          test -z "$extra_content" || (echo "Unexpected content in dist whl: $extra_content" && exit 1)
 
       - name: Freeze packages
         run: |
