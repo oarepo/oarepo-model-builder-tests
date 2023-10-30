@@ -42,12 +42,12 @@ echo "checking the test files are runnable"
 
 deactivate
 
-if [ -d .model_venv ] ; then
-    rm -rf .model_venv
+if [ -d .venv-model ] ; then
+    rm -rf .venv-model
 fi
 
-python3 -m venv .model_venv
-. .model_venv/bin/activate
+python3 -m venv .venv-model
+. .venv-model/bin/activate
 pip install -U setuptools pip wheel
 pip install "oarepo>=$OAREPO_VERSION,<$OAREPO_VERSION_MAX"
 pip install -e "$DIR/.[tests]"
