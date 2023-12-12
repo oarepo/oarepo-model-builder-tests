@@ -6,8 +6,6 @@ record:
           type: fulltext
         whateverkeyword:
           type: keyword
-        whateverboth:
-          type: fulltext+keyword
   use:
     - invenio
   module:
