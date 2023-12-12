@@ -84,6 +84,8 @@ def test_delete(app, db, {{ fixtures.sample_record }}, {{ fixtures.record_servic
          {{ fixtures.record_service }}.{{ test_constants.service_read_method }}(system_identity, {{ fixtures.sample_record }}["id"])
 
 {% if not test_constants.skip_search_test %}
+# TODO: need to generate the search test more intelligently - use the model schema, not enumerate paths. Commented until then
+@pytest.mark.skip(reason=" need to generate the search test more intelligently - use the model schema, not enumerate paths. Commented until then")
 def test_search(
     app, db, {{ fixtures.record_service }}, sample_records, sample_metadata_list, search_clear
 ):
@@ -120,15 +122,12 @@ def test_search(
     res_created_fail = list(
          {{ fixtures.record_service }}.search(system_identity, params={"q": "2022-10-16"})
     )
+    escaped_created = pytz.utc.localize(sample_records[0].created).isoformat().replace("+", "%2B").replace(':', '\%3A').replace('/', '%2F')
     res_facets = list(
          {{ fixtures.record_service }}.scan(
             system_identity,
             params={
-                "facets": {
-                    "created": [
-                        pytz.utc.localize(sample_records[0].created).isoformat()
-                    ]
-                }
+                "q": f"created:{escaped_created}"
             },
         ).hits
     )

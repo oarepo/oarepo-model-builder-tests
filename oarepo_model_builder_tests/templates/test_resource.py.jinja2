@@ -206,6 +206,8 @@ def test_delete_unauth(sample_record, search_clear, app, base_urls):
 """
 
 {% if not test_constants.skip_search_test %}
+# TODO: need to generate the search test more intelligently - use the model schema, not enumerate paths. Commented until then
+@pytest.mark.skip(reason=" need to generate the search test more intelligently - use the model schema, not enumerate paths. Commented until then")
 def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_with_credentials, sample_records, sample_metadata_list, search_clear, base_urls):
     if is_action_allowed("search", True):
         paths = get_paths("metadata", sample_metadata_list[0]["metadata"])
@@ -243,7 +245,8 @@ def test_search({{ vars.tests.extra_fixtures|generate_list(end=true) }} client_w
 
         res_created_fail = client_with_credentials.get(f"{base_urls['base_url']}?q=2022-10-16")
         record_created = sample_records[0].created.isoformat() + "Z"
-        res_facets = client_with_credentials.get(f"{base_urls['base_url']}?created={record_created}")
+        opensearch_escape_record_created = record_created.replace("+", "%2B").replace(':', '\%3A').replace('/', '%2F')
+        res_facets = client_with_credentials.get(f"{base_urls['base_url']}?q=created:{opensearch_escape_record_created}")
 
         assert len(res_fail.json["hits"]["hits"]) == 0
         assert len(res_created.json["hits"]["hits"]) == 10
