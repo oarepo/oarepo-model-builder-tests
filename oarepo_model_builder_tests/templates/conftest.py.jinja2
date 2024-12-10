@@ -33,6 +33,9 @@ APP_CONFIG = {
     # disable redis cache
     "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
     "CACHE_DEFAULT_TIMEOUT": 300,
+    "RDM_PERSISTENT_IDENTIFIERS": {},
+    "RDM_USER_MODERATION_ENABLED": True,
+    "RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD": False
 }
 
 @pytest.fixture
