@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-OAREPO_VERSION=${OAREPO_VERSION:-11}
+OAREPO_VERSION=${OAREPO_VERSION:-12}
 
 if [ -d .venv-builder ] ; then
     rm -rf .venv-builder
