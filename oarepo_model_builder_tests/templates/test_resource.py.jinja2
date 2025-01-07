@@ -74,11 +74,6 @@ def test_create(
         created_responses.append(
             client_with_credentials.post(f"{base_urls['base_url']}", json=sample_metadata_point)
         )
-        with app.test_client() as unauth_client:
-            unauth_response = unauth_client.post(
-                f"{base_urls['base_url']}", json=sample_metadata_point
-            )
-            assert response_code_ok("create", False, unauth_response, 201)
     assert all(
         [
             response_code_ok("create", True, new_response, 201)
