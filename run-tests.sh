@@ -48,7 +48,7 @@ fi
 python3 -m venv .venv-model
 . .venv-model/bin/activate
 pip install -U setuptools pip wheel
-pip install "oarepo[tests]==${OAREPO_VERSION}.*"
+pip install "oarepo[tests,rdm]==${OAREPO_VERSION}.*"
 pip install -e "$DIR/.[tests]"
 
 python $DIR/tests/conftest.py
