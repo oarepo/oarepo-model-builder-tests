@@ -38,7 +38,11 @@ APP_CONFIG = {
     "RDM_RECORDS_ALLOW_RESTRICTION_AFTER_GRACE_PERIOD": False,
     "RDM_ALLOW_METADATA_ONLY_RECORDS": True,
     "RDM_DEFAULT_FILES_ENABLED": False,
-
+    "SQLALCHEMY_ENGINE_OPTIONS": { # hack to avoid pool_timeout set in invenio_app_rdm
+        "pool_pre_ping": False,
+        "pool_recycle": 3600
+    },
+    "REST_CSRF_ENABLED": False
 }
 
 @pytest.fixture
